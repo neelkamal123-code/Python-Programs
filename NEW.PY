@@ -43,7 +43,7 @@ player_image = pygame.image.load("heroship.png")
 enemy_image = pygame.image.load("enemyship.png")
 ## bullets images
 bulletp = pygame.image.load("player_bullets.png")
-bullete = pygame.image.load("bomb.png")
+bullete = pygame.image.load("new_enemy.png")
 # chicken
 chicken = pygame.image.load("chicken.png")
 #pubg
@@ -81,6 +81,8 @@ def screen_image(image,x,y):
 welcome_back= pygame.image.load("welcome_screen.png")
 # END BACKGROUND
 end_screen_img = pygame.image.load("end_screen.png")
+# PAUSE BUTTON
+pause_img = pygame.image.load("pause.png")
 # ============================================
 
 # ====================================
@@ -188,6 +190,26 @@ def out_state_player_bullet(player_x,
         return player_x,bullet_y,bullet_state
 
 #============================================
+def pause_button(x,y):
+    mouse_pos = pygame.mouse.get_pos()
+    if( x+32>mouse_pos[0]>x and y+32>mouse_pos[1]>y):
+        click = pygame.mouse.get_pressed()
+        if(click[0] == 1):
+            exitgame = False
+            while not exitgame:
+                screen_text("PAUSED",white,250,100,fontl)
+                if(button1("RESUME",green,290,200,180,70)):
+                    break
+                button1("RESTART",green,290,280,180,70,gameloop)
+                button1("MENU",green,290,360,180,70,welcome)
+                button1("QUIT",green,290,440,180,70,quit_game)
+                for event in pygame.event.get():
+                    if(event.type == pygame.QUIT):
+                        exitgame = True
+                pygame.display.update()
+            # pygame.quit()
+            # quit()
+              
 
 #===============================================
 ## END SCREEN
@@ -246,6 +268,9 @@ def gameloop():
         screen_text(level_text[level],yellow,340,10,fonts)
         # LINE
         pygame.draw.line(window,white,(0,500),(800,500))
+        # PAUSE BUTTON
+        screen_image(pause_img,300,10)
+        pause_button(300,10)
 
         # SCORES
         screen_text(f"P_SCORE:{score_value1}",white,10,10,fontvs)
@@ -300,16 +325,20 @@ def quit_game():
     pygame.quit()
     quit()
 
-def button1(text,colour,x,y,w,h,action):
+def button1(text,colour,x,y,w,h,action=None):
     mouse_pos = pygame.mouse.get_pos()
     pygame.draw.rect(window,colour,(x,y,w,h))
     screen_text(text,black,x+20,y+20,fonts)
     if x+w>mouse_pos[0]>x and y+h>mouse_pos[1]>y:
         click = pygame.mouse.get_pressed()
-        if(click[0] == 1):
-            action()
         pygame.draw.rect(window,yellow,(x,y,w,h))
         screen_text(text,black,x+20,y+20,fonts)
+        if(click[0] == 1):
+            if(action != None):
+                action()
+            else:
+                return True
+       
             
 
 # ==========================================
