@@ -48,6 +48,7 @@ bullete = pygame.image.load("new_enemy.png")
 chicken = pygame.image.load("chicken.png")
 #pubg
 pubg = pygame.image.load("pubg.png")
+explosion = pygame.image.load("explosion.png")
 # ============================================
 # FONTS
 fontl = pygame.font.Font("freesansbold.ttf",64)
@@ -101,6 +102,10 @@ def show_game():
     pygame.quit()
     quit()
 # ======================================
+def explosion_img(x,y):
+    for i in range(50):
+        screen_image(explosion,x,y)
+        pygame.display.update()
 
 #===========================
 ## PLAYERS BULLET
@@ -128,8 +133,9 @@ def level_updater(score1,score2,level_curr):
     if(score1 == 10 and score2 < 10):
         level_curr = level_curr + 1 
         score1 = 0
-        return level_curr,score1
-    return level_curr,score1
+        score2 = 0
+        return level_curr,score1,score2
+    return level_curr,score1,score2
 # ====================================================
 def enemy_coll(level,enemy_x,enemy_y,enemyxchange
     ,bullet_x,bullet_y,bullet_y_e,player_x,player_y,score_value1,
@@ -158,6 +164,7 @@ def enemy_coll(level,enemy_x,enemy_y,enemyxchange
         if(iscollision(bullet_x,bullet_y,enemy_x[i],enemy_y[i])):
             explosion_sound = mixer.Sound("explosion.wav")
             explosion_sound.play()
+            explosion_img(enemy_x[i],enemy_y[i])
             score_value1 = score_value1 + 1
             bullet_y = 480
             bullet_state = "ready"
@@ -167,6 +174,7 @@ def enemy_coll(level,enemy_x,enemy_y,enemyxchange
         if(iscollision(enemy_x[i],bullet_y_e[i],player_x,player_y)):
             explosion_sound = mixer.Sound("explosion.wav")
             explosion_sound.play()
+            explosion_img(player_x,player_y)
             score_value2 = score_value2 + 1
             bullet_y_e[i] = enemy_y[i]
             player_x = random.randint(70,730)
@@ -199,13 +207,14 @@ def pause_button(x,y):
             while not exitgame:
                 screen_text("PAUSED",white,250,100,fontl)
                 if(button1("RESUME",green,290,200,180,70)):
-                    break
+                    exitgame = True
                 button1("RESTART",green,290,280,180,70,gameloop)
                 button1("MENU",green,290,360,180,70,welcome)
                 button1("QUIT",green,290,440,180,70,quit_game)
                 for event in pygame.event.get():
                     if(event.type == pygame.QUIT):
-                        exitgame = True
+                        pygame.quit()
+                        quit()
                 pygame.display.update()
             # pygame.quit()
             # quit()
@@ -315,7 +324,7 @@ def gameloop():
             end_screen()    
 
         ## LEVEL UPDATER
-        level,score_value1 = level_updater(score_value1,score_value2,level)
+        level,score_value1,score_value2 = level_updater(score_value1,score_value2,level)
         pygame.display.update()
 
     pygame.quit()
@@ -338,8 +347,28 @@ def button1(text,colour,x,y,w,h,action=None):
                 action()
             else:
                 return True
-       
-            
+
+def info():
+    run = True
+    while run:
+        window.fill(white)
+        for event in pygame.event.get():
+            if(event.type == pygame.QUIT):
+                pygame.quit()
+                quit()
+        screen_image(chicken,500,350)
+        screen_text("HOW TO GO ABOUT?",blue,100,5,fontl)
+        screen_text("1.THERE ARE 3 LEVELS",green,30,80,fontvs)
+        screen_text("2.KILL ENEMY SPACESHIPS AND STOP THEM FROM ENTERING YOUR PLANET.",
+        green,30,120,fontvs)
+        screen_text("2.1 STOP THEM BEFORE THEY CROSS THE LINE.",green,30,160,fontvs)
+        screen_text("3.KILL 10 ENEMIES TO REACH NEXT LEVEL.",green,30,200,fontvs)
+        screen_text("4.YOUR SHIP CAN SUSTAIN 10 MISSILE DAMAGE FOR EACH LEVEL.",green,30,240,fontvs)
+        screen_text(">.SUIT UP AND SAVE YOUR PLANET.",red,30,300,fonts)
+        if(button1("BACK",red,10,500,130,50)):
+            break
+        pygame.display.update()
+
 
 # ==========================================
 # WELCOME SCREEN FUNCTION
@@ -348,17 +377,17 @@ def welcome():
     while not exitgame:
         screen_image(welcome_back,0,0)
         screen_image(pubg,480,170)
-        screen_text("SPACE INVADER 2.0",black,87,70,fontl)
+        screen_text("XODUKU",black,250,70,fontl)
         screen_text("WELCOMES YOU",black,140,120,fontl)
         screen_text("ENEMY",black,310,220,fonts)
         screen_text("PLAYER",black,310,350,fonts)
-        # screen_text(">>> press 'SPACE' to START",red,180,450,fonts)
         ## enemyship
         screen_image(enemy_image,200,200)
         ## playership
         screen_image(player_image,200,330)
         # BUTTONS
         button1("PLAY",green,140,450,120,80,gameloop)
+        button1("?",blue,10,10,65,65,info)
         button1("QUIT",red,540,450,120,80,quit_game)
         for event in pygame.event.get():
             if(event.type == pygame.QUIT):
